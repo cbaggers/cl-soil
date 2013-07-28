@@ -2,9 +2,8 @@
 
 (asdf:defsystem #:cl-soil
   :serial t
-  :description "Wrapper around Soil (http://www.lonesock.net/soil.html)"
-  :author "Baggers"
-  :license "Specify license here"
+  :depends-on (#:cffi)
   :components ((:file "package")
-               (:file "cl-soil")))
+               (:file "cl-soil")
+               (:file "wrapper")))
 
