@@ -51,7 +51,7 @@
 (cffi:defcfun ("SOIL_load_OGL_texture" soil-load-ogl-texture) :unsigned-int
   (filename :pointer)
   (force-channels image-format-enum)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags ogl-texture-flags))
 
 (cffi:defcfun ("SOIL_load_OGL_texture_from_memory" 
@@ -59,7 +59,7 @@
   (buffer :pointer)
   (buffer-length :int)
   (force-channels image-format-enum)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags ogl-texture-flags))
 
 (cffi:defcfun ("SOIL_create_OGL_texture" soil-create-ogl-texture) 
@@ -68,7 +68,7 @@
   (width :int)
   (height :int)
   (channels :int)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
 (cffi:defcfun ("SOIL_load_OGL_single_cubemap_from_memory" 
@@ -77,7 +77,7 @@
   (buffer-length :int)
   (face-order :pointer)
   (force-channels image-format-enum)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
 (cffi:defcfun ("SOIL_save_screenshot" soil-save-screenshot) :int
@@ -95,7 +95,7 @@
   (height :int)
   (channels :int)
   (face-order :pointer)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
 (cffi:defcfun ("SOIL_load_OGL_single_cubemap" 
@@ -103,7 +103,7 @@
   (filename :pointer)
   (face-order :pointer)
   (force-channels image-format-enum)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
 (cffi:defcfun ("SOIL_last_result" soil-last-result) :pointer)
@@ -135,7 +135,7 @@
   (z-neg-buffer :pointer)
   (z-neg-buffer-length :int)
   (force-channels image-format-enum)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
 (cffi:defcfun ("SOIL_create_OGL_single_cubemap" 
@@ -145,7 +145,7 @@
   (height :int)
   (channels :int)
   (face-order :pointer)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
 (cffi:defcfun ("SOIL_load_image" soil-load-image) (:pointer :unsigned-char)
@@ -167,7 +167,7 @@
   (filename :pointer)
   (fake-hdr-format hdr-enum)
   (rescale-to-max :int)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
 (cffi:defcfun ("SOIL_load_OGL_cubemap" soil-load-ogl-cubemap) :unsigned-int
@@ -178,6 +178,6 @@
   (z-pos-file :pointer)
   (z-neg-file :pointer)
   (force-channels image-format-enum)
-  (reuse-texture-id :unsigned-int)
+  (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
