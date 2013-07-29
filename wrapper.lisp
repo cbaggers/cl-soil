@@ -66,7 +66,9 @@
     (soil-save-image c-filepath image-type width height channels
                      data)))
 
-(defun free-image-data ())
+;; [TODO] NOT IN WRAPPER &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+;; (defun free-image-data (data-pointer)
+;;   (soil-free-image-data ))
 
 ;;-----------------------------------------------------------------
 
@@ -129,7 +131,9 @@
   (with-foreign-string (path filepath)
     (soil-save-screenshot path image-type x y width height)))
 
+;;-----------------------------------------------------------------
+
+(defun last-result ()
+  (cffi:foreign-string-to-lisp (soil-last-result)))
 
 
-;; (with-foreign-object (info-log '%gl:char info-log-length)
-;;   )
