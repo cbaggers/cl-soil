@@ -4,6 +4,6 @@
   :serial t
   :depends-on (#:cffi)
   :components ((:file "package")
-               (:file "cl-soil")
-               (:file "wrapper")))
+               (:file "backend")
+               (:file "cl-soil")))
 

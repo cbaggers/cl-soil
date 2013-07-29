@@ -2,41 +2,19 @@
 
 (defpackage #:cl-soil
   (:use #:cl :cffi)
-  (:export "SOIL-LOAD-OGL-CUBEMAP"
-           "SOIL-LOAD-OGL-HDR-TEXTURE"
-           "SOIL-SAVE-IMAGE"
-           "SOIL-LOAD-IMAGE"
-           "SOIL-HDR-RG-BDIV-A-2"
-           "SOIL-HDR-RG-BDIV-A"
-           "SOIL-HDR-RGBE"
-           "SOIL-CREATE-NEW-ID"
-           "SOIL-LOAD-RGBA"
-           "SOIL-LOAD-RGB"
-           "SOIL-LOAD-LA"
-           "SOIL-LOAD-L"
-           "SOIL-LOAD-AUTO"
-           "SOIL-CREATE-OGL-SINGLE-CUBEMAP"
-           "SOIL-LOAD-OGL-CUBEMAP-FROM-MEMORY"
-           "SOIL-LOAD-IMAGE-FROM-MEMORY"
-           "SOIL-LAST-RESULT"
-           "SOIL-LOAD-OGL-SINGLE-CUBEMAP"
-           "SOIL-SAVE-SCREENSHOT"
-           "SOIL-LOAD-OGL-SINGLE-CUBEMAP-FROM-MEMORY"
-           "SOIL-SAVE-TYPE-DDS"
-           "SOIL-SAVE-TYPE-BMP"
-           "SOIL-SAVE-TYPE-TGA"
-           "SOIL-FLAG-TEXTURE-RECTANGLE"
-           "SOIL-FLAG-CO-CG-Y"
-           "SOIL-FLAG-NTSC-SAFE-RGB"
-           "SOIL-FLAG-DDS-LOAD-DIRECT"
-           "SOIL-FLAG-COMPRESS-TO-DXT"
-           "SOIL-FLAG-INVERT-Y"
-           "SOIL-FLAG-MULTIPLY-ALPHA"
-           "SOIL-FLAG-TEXTURE-REPEATS"
-           "SOIL-FLAG-MIPMAPS"
-           "SOIL-FLAG-POWER-OF-TWO"
-           "SOIL-CREATE-OGL-TEXTURE"
-           "SOIL-LOAD-OGL-TEXTURE"
-           "SOIL-LOAD-OGL-TEXTURE-FROM-MEMORY"
-           "SOIL-FREE-IMAGE-DATA"))
+  (:export :load-ogl-texture
+           :load-ogl-texture-from-memory
+           :create-ogl-texture
+           :load-ogl-hdr-texture
+           :load-image
+           :load-image-from-memory
+           :save-image
+           :free-image-data
+           :load-ogl-cubemap
+           :load-ogl-cubemap-from-memory           
+           :load-ogl-single-cubemap
+           :load-ogl-single-cubemap-from-memory
+           :create-ogl-single-cubemap
+           :save-screenshot
+           :last-result))
 
