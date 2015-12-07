@@ -1,4 +1,4 @@
-(cl:in-package :cl-soil)
+(cl:in-package #:cl-soil)
 
 ;; [TODO] give option for failure not erroring
 ;; [TODO] Ensure that what is being loaded is a file (load image went nuts when 
@@ -6,8 +6,8 @@
 
 (defun handle-tex-flags (flags)
   (if (listp flags) 
-      (loop :for flag :in flags :summing 
-         (cffi:foreign-enum-value 'ogl-texture-flags flag))
+      (loop :for flag :in flags
+            :summing (cffi:foreign-enum-value 'ogl-texture-flags flag))
       flags))
 
 (defmacro with-zero-being-an-error (func-name &body body)
@@ -60,8 +60,10 @@
                                              c-channels force-channels)))
         (if (null-pointer-p result-pointer)
             (error "Could not load image ~a~%Recieved NULL pointer" filepath)
-            (list result-pointer (mem-aref c-width :int) 
-                  (mem-aref c-height :int) (mem-aref c-channels :int)))))))
+            (values result-pointer
+                    (mem-aref c-width :int)
+                    (mem-aref c-height :int)
+                    (mem-aref c-channels :int)))))))
 
 ;; [TODO] channels will be to be turned back to a keyword/s
 ;; [TODO] error detection
@@ -72,8 +74,10 @@
                            data-pointer data-length
                            c-width c-height
                            c-channels force-channels)))
-      (list result-pointer (mem-aref c-width :int) 
-            (mem-aref c-height :int) (mem-aref c-channels :int)))))
+      (values result-pointer
+              (mem-aref c-width :int)
+              (mem-aref c-height :int)
+              (mem-aref c-channels :int)))))
 
 (defun save-image (filepath image-type width height channels data)
   (with-foreign-string (c-filepath filepath)
@@ -143,15 +147,18 @@
              reuse-texture-id (handle-tex-flags flags))))
         (error "CL-SOIL: Face order spec incorrect"))))
 
-(defun create_ogl_single_cubemap (data-pointer width height channels face-order
+(defun create-ogl-single-cubemap (data-pointer width height channels face-order
                                   reuse-texture-id flags)
   (let ((order (symbol-name face-order))) 
     (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD") 
              (eql 6 (length order)))        
         (with-foreign-string (c-face-order face-order)
           (with-zero-being-an-error "create_ogl_single_cubemap"
-            (soil-create-ogl-single-cubemap data-pointer width height channels
-                                            c-face-order force-channels
+            (soil-create-ogl-single-cubemap data-pointer
+                                            width
+                                            height
+                                            channels
+                                            c-face-order
                                             reuse-texture-id
                                             (handle-tex-flags flags))))
         (error "CL-SOIL: Face order spec incorrect"))))
