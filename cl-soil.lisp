@@ -1,11 +1,11 @@
 (cl:in-package #:cl-soil)
 
 ;; [TODO] give option for failure not erroring
-;; [TODO] Ensure that what is being loaded is a file (load image went nuts when 
+;; [TODO] Ensure that what is being loaded is a file (load image went nuts when
 ;;                                                    I opened a directory)
 
 (defun handle-tex-flags (flags)
-  (if (listp flags) 
+  (if (listp flags)
       (loop :for flag :in flags
             :summing (cffi:foreign-enum-value 'ogl-texture-flags flag))
       flags))
@@ -18,19 +18,19 @@
                   (last-result))
            ,result))))
 
-(defun load-ogl-texture (filepath &optional (force-channels :rgba) 
+(defun load-ogl-texture (filepath &optional (force-channels :rgba)
                                     (reuse-texture-id 0) flags)
   (with-foreign-string (c-filepath filepath)
     (with-zero-being-an-error "load-ogl-texture"
-      (soil-load-ogl-texture c-filepath force-channels reuse-texture-id 
+      (soil-load-ogl-texture c-filepath force-channels reuse-texture-id
                              (handle-tex-flags flags)))))
 
 (defun load-ogl-texture-from-memory (data-pointer data-length
-                                     &optional (force-channels :rgba) 
-                                       (reuse-texture-id 0) flags)  
+                                     &optional (force-channels :rgba)
+                                       (reuse-texture-id 0) flags)
   (with-zero-being-an-error "load-ogl-texture-from-memory"
     (soil-load-ogl-texture-from-memory data-pointer data-length force-channels
-                                       reuse-texture-id 
+                                       reuse-texture-id
                                        (handle-tex-flags flags))))
 
 (defun create-ogl-texture (data-pointer width height
@@ -40,12 +40,12 @@
     (soil-create-ogl-texture data-pointer width height channels reuse-texture-id
                              (handle-tex-flags flags))))
 
-(defun load-ogl-hdr-texture (filepath 
+(defun load-ogl-hdr-texture (filepath
                              &optional fake-hdr-format (rescale-to-max 0)
                                (reuse-texture-id 0) flags)
   (with-foreign-string (c-filepath filepath)
     (with-zero-being-an-error "load-ogl-hdr-texture"
-      (soil-load-ogl-hdr-texture 
+      (soil-load-ogl-hdr-texture
        c-filepath fake-hdr-format rescale-to-max reuse-texture-id
        (handle-tex-flags flags)))))
 
@@ -56,7 +56,7 @@
 (defun load-image (filepath &optional (force-channels :rgba))
   (with-foreign-string (c-filepath filepath)
     (with-foreign-objects ((c-width :int) (c-height :int) (c-channels :int))
-      (let ((result-pointer (soil-load-image c-filepath c-width c-height 
+      (let ((result-pointer (soil-load-image c-filepath c-width c-height
                                              c-channels force-channels)))
         (if (null-pointer-p result-pointer)
             (error "Could not load image ~a~%Recieved NULL pointer" filepath)
@@ -70,7 +70,7 @@
 (defun load-image-from-memory (data-pointer data-length
                                &optional (force-channels :rgba))
   (with-foreign-objects ((c-width :int) (c-height :int) (c-channels :int))
-    (let ((result-pointer (soil-load-image-from-memory 
+    (let ((result-pointer (soil-load-image-from-memory
                            data-pointer data-length
                            c-width c-height
                            c-channels force-channels)))
@@ -98,7 +98,7 @@
                          (ypf y-pos-filepath) (ynf y-neg-filepath)
                          (zpf z-pos-filepath) (znf z-neg-filepath))
     (with-zero-being-an-error "load-ogl-cubemap"
-      (soil-load-ogl-cubemap xpf xnf ypf ynf zpf znf force-channels 
+      (soil-load-ogl-cubemap xpf xnf ypf ynf zpf znf force-channels
                              reuse-texture-id (handle-tex-flags flags)))))
 
 (defun load-ogl-cubemap-from-memory (x-pos-buffer-pointer x-pos-buffer-length
@@ -107,7 +107,7 @@
                                      y-neg-buffer-pointer y-neg-buffer-length
                                      z-pos-buffer-pointer z-pos-buffer-length
                                      z-neg-buffer-pointer z-neg-buffer-length
-                                     &optional (force-channels :rgba) 
+                                     &optional (force-channels :rgba)
                                        (reuse-texture-id 0) flags)
   (with-zero-being-an-error "load-ogl-cubemap-from-memory"
     (soil-load-ogl-cubemap-from-memory x-pos-buffer-pointer x-pos-buffer-length
@@ -116,15 +116,15 @@
                                        y-neg-buffer-pointer y-neg-buffer-length
                                        z-pos-buffer-pointer z-pos-buffer-length
                                        z-neg-buffer-pointer z-neg-buffer-length
-                                       force-channels reuse-texture-id 
+                                       force-channels reuse-texture-id
                                        (handle-tex-flags flags))))
 
 ;; [TODO] format check into func
-(defun load-ogl-single-cubemap (filepath face-order 
+(defun load-ogl-single-cubemap (filepath face-order
                                 &optional (force-channels :rgba)
                                   (reuse-texture-id 0) flags)
-  (let ((order (symbol-name face-order))) 
-    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD") 
+  (let ((order (symbol-name face-order)))
+    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD")
              (eql 6 (length order)))
         (with-foreign-strings ((c-filepath filepath)
                                (c-face-order order))
@@ -134,24 +134,24 @@
                                           (handle-tex-flags flags))))
         (error "CL-SOIL: Face order spec incorrect"))))
 
-(defun load-ogl-single-cubemap-from-memory (data-pointer data-length face-order 
+(defun load-ogl-single-cubemap-from-memory (data-pointer data-length face-order
                                             &optional (force-channels :rgba)
                                               (reuse-texture-id 0) flags)
-  (let ((order (symbol-name face-order))) 
-    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD") 
-             (eql 6 (length order)))   
+  (let ((order (symbol-name face-order)))
+    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD")
+             (eql 6 (length order)))
         (with-foreign-string (c-face-order face-order)
           (with-zero-being-an-error "load-ogl-cubemap-from-memory"
-            (soil-load-ogl-single-cubemap-from-memory 
+            (soil-load-ogl-single-cubemap-from-memory
              data-pointer data-length c-face-order force-channels
              reuse-texture-id (handle-tex-flags flags))))
         (error "CL-SOIL: Face order spec incorrect"))))
 
 (defun create-ogl-single-cubemap (data-pointer width height channels face-order
                                   reuse-texture-id flags)
-  (let ((order (symbol-name face-order))) 
-    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD") 
-             (eql 6 (length order)))        
+  (let ((order (symbol-name face-order)))
+    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD")
+             (eql 6 (length order)))
         (with-foreign-string (c-face-order face-order)
           (with-zero-being-an-error "create_ogl_single_cubemap"
             (soil-create-ogl-single-cubemap data-pointer

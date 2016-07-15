@@ -5,5 +5,5 @@
   :depends-on (#:cffi)
   :components ((:file "package")
                (:file "backend")
-               (:file "cl-soil")))
-
+               (:file "cl-soil")
+	       (:file "stbi")))

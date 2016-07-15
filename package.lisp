@@ -17,3 +17,8 @@
            #:create-ogl-single-cubemap
            #:save-screenshot
            #:last-result))
+
+(defpackage #:stb-image
+  (:use #:cl #:cffi)
+  (:nicknames :stbi)
+  (:export #:loadf))
