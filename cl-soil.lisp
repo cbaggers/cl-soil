@@ -54,16 +54,25 @@
 ;; [TODO] channels will be to be turned back to a keyword/s
 ;; [TODO] error detection
 (defun load-image (filepath &optional (force-channels :rgba))
+  (assert (member force-channels '(:auto :l :la :rgb :rgba)))
   (with-foreign-string (c-filepath filepath)
     (with-foreign-objects ((c-width :int) (c-height :int) (c-channels :int))
       (let ((result-pointer (soil-load-image c-filepath c-width c-height
                                              c-channels force-channels)))
-        (if (null-pointer-p result-pointer)
-            (error "Could not load image ~a~%Recieved NULL pointer" filepath)
-            (values result-pointer
-                    (mem-aref c-width :int)
-                    (mem-aref c-height :int)
-                    (mem-aref c-channels :int)))))))
+	(if (null-pointer-p result-pointer)
+	    (error "Could not load image ~a~%Recieved NULL pointer" filepath)
+	    (let* ((component-length (mem-aref c-channels :int))
+		   (component-lengths (cdr (assoc force-channels
+						  `((:auto . ,component-length)
+						    (:l . 1)
+						    (:la . 2)
+						    (:rgb . 3)
+						    (:rgba . 4))))))
+	      (values result-pointer
+		      (mem-aref c-width :int)
+		      (mem-aref c-height :int)
+		      component-length
+		      component-lengths)))))))
 
 ;; [TODO] channels will be to be turned back to a keyword/s
 ;; [TODO] error detection
