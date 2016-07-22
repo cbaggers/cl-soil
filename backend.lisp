@@ -7,6 +7,8 @@
 
 (cffi:define-foreign-library soil
   (:windows "SOIL.dll")
+  (:darwin #.(asdf:system-relative-pathname
+              :cl-soil "lib/OSX/elcapitan/libSOIL.dylib"))
   (:unix (:or "libSOIL.so"
               "libSOIL.so.1"
               "libSOIL.a"
