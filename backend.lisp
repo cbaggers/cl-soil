@@ -138,16 +138,6 @@
   (reuse-texture-id reuse-enum)
   (flags :unsigned-int))
 
-(cffi:defcfun ("SOIL_create_OGL_single_cubemap"
-               soil-create-ogl-single-cubemap) :unsigned-int
-  (data :pointer)
-  (width :int)
-  (height :int)
-  (channels :int)
-  (face-order :pointer)
-  (reuse-texture-id reuse-enum)
-  (flags :unsigned-int))
-
 (cffi:defcfun ("SOIL_load_image" soil-load-image) (:pointer :unsigned-char)
   (filename :pointer)
   (width (:pointer :int))
