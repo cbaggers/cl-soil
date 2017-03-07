@@ -89,10 +89,11 @@
               (mem-aref c-channels :int)))))
 
 (defun save-image (filepath image-type width height channels data)
-  (with-foreign-string (c-filepath filepath)
-    (with-zero-being-an-error "save-image"
-      (soil-save-image c-filepath image-type width height channels
-                       data))))
+  (let ((path (uiop:native-namestring filepath)))
+    (with-foreign-string (c-filepath path)
+      (with-zero-being-an-error "save-image"
+        (soil-save-image c-filepath image-type width height channels
+                         data)))))
 
 (defun free-image-data (data-pointer)
   (soil-free-image-data data-pointer))
