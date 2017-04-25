@@ -7,7 +7,7 @@
 (defun handle-tex-flags (flags)
   (if (listp flags)
       (loop :for flag :in flags
-            :summing (cffi:foreign-enum-value 'ogl-texture-flags flag))
+         :summing (cffi:foreign-enum-value 'ogl-texture-flags flag))
       flags))
 
 (defmacro with-zero-being-an-error (func-name &body body)
@@ -59,20 +59,20 @@
     (with-foreign-objects ((c-width :int) (c-height :int) (c-channels :int))
       (let ((result-pointer (soil-load-image c-filepath c-width c-height
                                              c-channels force-channels)))
-	(if (null-pointer-p result-pointer)
-	    (error "Could not load image ~a~%Recieved NULL pointer" filepath)
-	    (let* ((component-length (mem-aref c-channels :int))
-		   (component-lengths (cdr (assoc force-channels
-						  `((:auto . ,component-length)
-						    (:l . 1)
-						    (:la . 2)
-						    (:rgb . 3)
-						    (:rgba . 4))))))
-	      (values result-pointer
-		      (mem-aref c-width :int)
-		      (mem-aref c-height :int)
-		      component-length
-		      component-lengths)))))))
+        (if (null-pointer-p result-pointer)
+            (error "Could not load image ~a~%Recieved NULL pointer" filepath)
+            (let* ((component-length (mem-aref c-channels :int))
+                   (component-lengths (cdr (assoc force-channels
+                                                  `((:auto . ,component-length)
+                                                    (:l . 1)
+                                                    (:la . 2)
+                                                    (:rgb . 3)
+                                                    (:rgba . 4))))))
+              (values result-pointer
+                      (mem-aref c-width :int)
+                      (mem-aref c-height :int)
+                      component-length
+                      component-lengths)))))))
 
 ;; [TODO] channels will be to be turned back to a keyword/s
 ;; [TODO] error detection
@@ -89,9 +89,11 @@
               (mem-aref c-channels :int)))))
 
 (defun save-image (filepath image-type width height channels data)
-  (with-foreign-string (c-filepath filepath)
-    (soil-save-image c-filepath image-type width height channels
-                     data)))
+  (let ((path (uiop:native-namestring filepath)))
+    (with-foreign-string (c-filepath path)
+      (with-zero-being-an-error "save-image"
+        (soil-save-image c-filepath image-type width height channels
+                         data)))))
 
 (defun free-image-data (data-pointer)
   (soil-free-image-data data-pointer))
