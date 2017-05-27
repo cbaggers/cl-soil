@@ -1,5 +1,0 @@
-
-;; [TODO] Should we abstract buffers into a lisp object?
-;;        hmm maybe not, I could then write a cepl wrapper (dirt)
-;;        to use gl-arrays
-
