@@ -5,12 +5,20 @@
 
 (cl:in-package :cl-soil)
 
+(pushnew (uiop:ensure-directory-pathname
+          (asdf:system-relative-pathname :cl-soil "lib"))
+         cffi:*foreign-library-directories*)
+
 (cffi:define-foreign-library soil
-  (:windows "SOIL.dll")
+  (:darwin (:or "libSOIL.dylib"
+                #+X86-64 "local_x64_libSOIL.dylib"))
   (:unix (:or "libSOIL.so"
               "libSOIL.so.1"
-              "libSOIL.a"
-              "libSOIL")))
+              #+X86-64 "local_x64_libSOIL.so"))
+  (:windows (:or "libSOIL.dll"
+                 #+X86 "local_x86_libSOIL.dll"
+                 #+X86-64 "local_x64_libSOIL.dll"))
+  (t (:default "libSOIL.so")))
 
 (cffi:use-foreign-library soil)
 
