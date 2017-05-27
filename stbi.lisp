@@ -10,8 +10,8 @@
 (defun loadf (filepath)
   (with-foreign-string (c-filepath filepath)
     (with-foreign-objects ((width :int)
-                           (height :int)
-                           (components-per-pixel :int))
+			   (height :int)
+			   (components-per-pixel :int))
       (cl-soil::with-zero-being-an-error "loadf"
         (let ((result (%loadf c-filepath width height components-per-pixel 0)))
           (if (null-pointer-p result)
