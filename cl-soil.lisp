@@ -1,14 +1,24 @@
-(cl:in-package #:cl-soil)
+(in-package #:cl-soil)
 
-;; [TODO] give option for failure not erroring
-;; [TODO] Ensure that what is being loaded is a file (load image went nuts when
-;;                                                    I opened a directory)
+;;-----------------------------------------------------------------
+;; Helpers
 
-(defun handle-tex-flags (flags)
-  (if (listp flags)
-      (loop :for flag :in flags
-         :summing (cffi:foreign-enum-value 'ogl-texture-flags flag))
-      flags))
+(defmacro with-foreign-filepath ((c-str-var filepath &key directory-p)
+                                 &body body)
+  (let ((path (gensym "path")))
+    `(let* ((,path ,filepath)
+            (,path (uiop:native-namestring
+                    (if ,directory-p
+                        (uiop:ensure-directory-pathname ,path)
+                        ,path))))
+       (with-foreign-string (,c-str-var ,path)
+         ,@body))))
+
+(defmacro with-foreign-filepaths (var-path-dir-tripples &body body)
+  (reduce (lambda (acc x) ` (with-foreign-filepath ,acc ,x))
+          var-path-dir-tripples
+          :initial-value `(progn ,@body)
+          :from-end t))
 
 (defmacro with-zero-being-an-error (func-name &body body)
   (let ((result (gensym "result")))
@@ -17,6 +27,14 @@
            (error ,(format nil "CL-Soil: ~a returned a 0 signalling a failure~~%Last Result was: ~~a" func-name)
                   (last-result))
            ,result))))
+
+(defun handle-tex-flags (flags)
+  (reduce (lambda (a x)
+            (logior a (cffi:foreign-enum-value 'ogl-texture-flags x)))
+          (uiop:ensure-list flags)
+          :initial-value 0))
+
+;;-----------------------------------------------------------------
 
 (defun load-ogl-texture (filepath &optional (force-channels :rgba)
                                     (reuse-texture-id 0) flags)
@@ -43,7 +61,7 @@
 (defun load-ogl-hdr-texture (filepath
                              &optional fake-hdr-format (rescale-to-max 0)
                                (reuse-texture-id 0) flags)
-  (with-foreign-string (c-filepath filepath)
+  (with-foreign-filepath (c-filepath filepath)
     (with-zero-being-an-error "load-ogl-hdr-texture"
       (soil-load-ogl-hdr-texture
        c-filepath fake-hdr-format rescale-to-max reuse-texture-id
@@ -55,24 +73,24 @@
 ;; [TODO] error detection
 (defun load-image (filepath &optional (force-channels :rgba))
   (assert (member force-channels '(:auto :l :la :rgb :rgba)))
-  (with-foreign-string (c-filepath filepath)
+  (with-foreign-filepath (c-filepath filepath)
     (with-foreign-objects ((c-width :int) (c-height :int) (c-channels :int))
       (let ((result-pointer (soil-load-image c-filepath c-width c-height
                                              c-channels force-channels)))
         (if (null-pointer-p result-pointer)
             (error "Could not load image ~a~%Recieved NULL pointer" filepath)
-            (let* ((component-length (mem-aref c-channels :int))
-                   (component-lengths (cdr (assoc force-channels
-                                                  `((:auto . ,component-length)
-                                                    (:l . 1)
-                                                    (:la . 2)
-                                                    (:rgb . 3)
-                                                    (:rgba . 4))))))
+            (let* ((data-comp-len (mem-aref c-channels :int))
+                   (img-comp-lens (cdr (assoc force-channels
+                                              `((:auto . ,data-comp-len)
+                                                (:l . 1)
+                                                (:la . 2)
+                                                (:rgb . 3)
+                                                (:rgba . 4))))))
               (values result-pointer
                       (mem-aref c-width :int)
                       (mem-aref c-height :int)
-                      component-length
-                      component-lengths)))))))
+                      data-comp-len
+                      img-comp-lens)))))))
 
 ;; [TODO] channels will be to be turned back to a keyword/s
 ;; [TODO] error detection
@@ -83,17 +101,26 @@
                            data-pointer data-length
                            c-width c-height
                            c-channels force-channels)))
-      (values result-pointer
-              (mem-aref c-width :int)
-              (mem-aref c-height :int)
-              (mem-aref c-channels :int)))))
+      (let* ((data-comp-len (mem-aref c-channels :int))
+             (img-comp-lens (cdr (assoc force-channels
+                                        `((:auto . ,data-comp-len)
+                                          (:l . 1)
+                                          (:la . 2)
+                                          (:rgb . 3)
+                                          (:rgba . 4))))))
+        (values result-pointer
+                (mem-aref c-width :int)
+                (mem-aref c-height :int)
+                data-comp-len
+                img-comp-lens)))))
 
 (defun save-image (filepath image-type width height channels data)
   (let ((path (uiop:native-namestring filepath)))
-    (with-foreign-string (c-filepath path)
+    (with-foreign-filepath (c-filepath path)
       (with-zero-being-an-error "save-image"
         (soil-save-image c-filepath image-type width height channels
-                         data)))))
+                         data)))
+    filepath))
 
 (defun free-image-data (data-pointer)
   (soil-free-image-data data-pointer))
@@ -105,9 +132,9 @@
                          z-pos-filepath z-neg-filepath
                          &optional (force-channels :rgba)
                            (reuse-texture-id 0) flags)
-  (with-foreign-strings ((xpf x-pos-filepath) (xnf x-neg-filepath)
-                         (ypf y-pos-filepath) (ynf y-neg-filepath)
-                         (zpf z-pos-filepath) (znf z-neg-filepath))
+  (with-foreign-filepaths ((xpf x-pos-filepath) (xnf x-neg-filepath)
+                           (ypf y-pos-filepath) (ynf y-neg-filepath)
+                           (zpf z-pos-filepath) (znf z-neg-filepath))
     (with-zero-being-an-error "load-ogl-cubemap"
       (soil-load-ogl-cubemap xpf xnf ypf ynf zpf znf force-channels
                              reuse-texture-id (handle-tex-flags flags)))))
@@ -135,34 +162,39 @@
                                 &optional (force-channels :rgba)
                                   (reuse-texture-id 0) flags)
   (let ((order (symbol-name face-order)))
-    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD")
-             (eql 6 (length order)))
-        (with-foreign-strings ((c-filepath filepath)
-                               (c-face-order order))
-          (with-zero-being-an-error "load-ogl-single-cubemap"
-            (soil-load-ogl-single-cubemap c-filepath c-face-order force-channels
-                                          reuse-texture-id
-                                          (handle-tex-flags flags))))
-        (error "CL-SOIL: Face order spec incorrect"))))
+    (if (and (every #'(lambda (char) (= (count char order) 1))
+                    "NSEWUD")
+             (= (length order) 6))
+        (with-foreign-filepath (c-filepath filepath)
+          (with-foreign-string (c-face-order order)
+            (with-zero-being-an-error "load-ogl-single-cubemap"
+              (soil-load-ogl-single-cubemap c-filepath c-face-order force-channels
+                                            reuse-texture-id
+                                            (handle-tex-flags flags)))))
+        (error "CL-SOIL: Face order spec incorrect. Recieved ~a"
+               face-order))))
 
 (defun load-ogl-single-cubemap-from-memory (data-pointer data-length face-order
                                             &optional (force-channels :rgba)
                                               (reuse-texture-id 0) flags)
   (let ((order (symbol-name face-order)))
-    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD")
-             (eql 6 (length order)))
+    (if (and (every #'(lambda (char) (= (count char order) 1))
+                    "NSEWUD")
+             (= 6 (length order)))
         (with-foreign-string (c-face-order face-order)
           (with-zero-being-an-error "load-ogl-cubemap-from-memory"
             (soil-load-ogl-single-cubemap-from-memory
              data-pointer data-length c-face-order force-channels
              reuse-texture-id (handle-tex-flags flags))))
-        (error "CL-SOIL: Face order spec incorrect"))))
+        (error "CL-SOIL: Face order spec incorrect. Recieved ~a"
+               face-order))))
 
 (defun create-ogl-single-cubemap (data-pointer width height channels face-order
                                   reuse-texture-id flags)
   (let ((order (symbol-name face-order)))
-    (if (and (every #'(lambda (char) (eql 1 (count char order))) "NSEWUD")
-             (eql 6 (length order)))
+    (if (and (every #'(lambda (char) (= (count char order) 1))
+                    "NSEWUD")
+             (= 6 (length order)))
         (with-foreign-string (c-face-order face-order)
           (with-zero-being-an-error "create_ogl_single_cubemap"
             (soil-create-ogl-single-cubemap data-pointer
@@ -172,15 +204,17 @@
                                             c-face-order
                                             reuse-texture-id
                                             (handle-tex-flags flags))))
-        (error "CL-SOIL: Face order spec incorrect"))))
+        (error "CL-SOIL: Face order spec incorrect. Recieved ~a"
+               face-order))))
 
 ;;-----------------------------------------------------------------
 
 ;; [TODO] get width and height if nil
 (defun save-screenshot (filepath image-type x y width height)
-  (with-foreign-string (path filepath)
+  (with-foreign-filepath (path filepath)
     (with-zero-being-an-error "save-screenshot"
-      (soil-save-screenshot path image-type x y width height))))
+      (soil-save-screenshot path image-type x y width height)))
+  filepath)
 
 ;;-----------------------------------------------------------------
 
