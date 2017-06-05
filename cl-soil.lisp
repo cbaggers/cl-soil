@@ -38,7 +38,7 @@
 
 (defun load-ogl-texture (filepath &optional (force-channels :rgba)
                                     (reuse-texture-id 0) flags)
-  (with-foreign-string (c-filepath filepath)
+  (with-foreign-filepath (c-filepath filepath)
     (with-zero-being-an-error "load-ogl-texture"
       (soil-load-ogl-texture c-filepath force-channels reuse-texture-id
                              (handle-tex-flags flags)))))
