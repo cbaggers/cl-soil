@@ -51,8 +51,8 @@
 
 (cffi:defcenum hdr-enum
   (:rgbe 0)
-  (:rg-bdiv-a 1)
-  (:rg-bdiv-a-2 2))
+  (:rgb-div-a 1)
+  (:rgb-div-a2 2))
 
 ;;----------------------------------------------------
 

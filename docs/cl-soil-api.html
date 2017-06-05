@@ -1,0 +1,210 @@
+<!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml"> <head> <meta charset="utf-8"/> <title>CL-SOIL</title> <link href="soil-styles.css" rel="stylesheet" type="text/css"/> </head> <body> <header> <h1>cl-soil</h1> <span class="version"/> <p class="description">A thin binding over libSOIL.so which allows easy loading of images</p> </header> <div id="content">  <article><h1>cl-soil</h1> <p>Common lisp wrapper around the SOIL library (http://www.lonesock.net/soil.html)</p> <p><strong>Files</strong> backend.lisp - Contains the cffi library, function and enum definitions
+cl-soil.lisp - Contains the lisp frontend functions</p> </article>  <article>  <h2>Copyright</h2> <span>cl-soil</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=BSD 2 Clause">BSD 2 Clause</a></span> license.  © <span>Chris Bagley (Baggers) &lt;techsnuffle@gmail.com&gt;</span> .    </article>  <article id="symbol-index"> <h2>Package Index</h2> <ul><li class="package" style="list-style-type: none"> <h3> <a name="CL-SOIL" href="#CL-SOIL">CL-SOIL</a> <span class="nicknames"/> </h3> <ul><li style="list-style-type: none"> <a name="CL-SOIL:CREATE-OGL-SINGLE-CUBEMAP"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:CREATE-OGL-SINGLE-CUBEMAP">CREATE-OGL-SINGLE-CUBEMAP</a> </code> <code class="qualifiers"></code> <code class="arguments">DATA-POINTER WIDTH HEIGHT CHANNELS FACE-ORDER REUSE-TEXTURE-ID FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Creates an OpenGL cubemap texture by splitting up 1 image into 6 parts.
+Returns the texture-id</p> <p>data-pointer: pointer to the image data</p> <p>width: width of the image in pixels</p> <p>height: height of the image in pixels</p> <p>channels: the number of channels:</p> <pre><code>Count   Meaning
+----------------------
+1       luminous
+2       luminous/alpha
+3       RGB
+4       RGBA
+</code></pre> <p>face-order: the order of the faces in the file. Any combination of NSWEUD,
+for North, South, Up, etc as a keyword. For example :UDNSWE</p> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:CREATE-OGL-TEXTURE"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:CREATE-OGL-TEXTURE">CREATE-OGL-TEXTURE</a> </code> <code class="qualifiers"></code> <code class="arguments">DATA-POINTER WIDTH HEIGHT &amp;OPTIONAL (CHANNELS 4) (REUSE-TEXTURE-ID 0) FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Creates a 2D OpenGL texture from raw image data. Returns the texture-id</p> <p>data-pointer: pointer to the image data</p> <p>width: width of the image in pixels</p> <p>height: height of the image in pixels</p> <p>channels: the number of channels:</p> <pre><code>Count   Meaning
+----------------------
+1       luminous
+2       luminous/alpha
+3       RGB
+4       RGBA
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:FREE-IMAGE-DATA"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:FREE-IMAGE-DATA">FREE-IMAGE-DATA</a> </code> <code class="qualifiers"></code> <code class="arguments">DATA-POINTER</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Frees the image data.</p> <p>This is really just cffi:foreign-free but exists as a reminder to free your
+data.</p> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LAST-RESULT"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LAST-RESULT">LAST-RESULT</a> </code> <code class="qualifiers"></code> <code class="arguments"></code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>This function resturn a string describing the last thing that happened
+inside SOIL.  It can be used to determine why an image failed to load.</p> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-IMAGE"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-IMAGE">LOAD-IMAGE</a> </code> <code class="qualifiers"></code> <code class="arguments">FILEPATH &amp;OPTIONAL (FORCE-CHANNELS :RGBA)</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads an image from disk. Returns the following:</p> <ul> <li>A pointer to the image data</li> <li>the width of the image</li> <li>the height of the image</li> <li>the component-count of the source data</li> <li>the component-count of the loaded image</li> </ul> <p>Where the component-count is one of the following:</p> <pre><code>Count   Meaning
+----------------------
+1       luminous
+2       luminous/alpha
+3       RGB
+4       RGBA
+</code></pre> <p>filename: the name of the file to load</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-IMAGE-FROM-MEMORY"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-IMAGE-FROM-MEMORY">LOAD-IMAGE-FROM-MEMORY</a> </code> <code class="qualifiers"></code> <code class="arguments">DATA-POINTER DATA-LENGTH &amp;OPTIONAL (FORCE-CHANNELS :RGBA)</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads an image from memory. Returns the following:</p> <ul> <li>A pointer to the image data</li> <li>the width of the image in pixels</li> <li>the height of the image in pixels</li> <li>the component-count of the source data</li> <li>the component-count of the loaded image</li> </ul> <p>Where the component-count is one of the following:</p> <pre><code>Count   Meaning
+----------------------
+1       luminous
+2       luminous/alpha
+3       RGB
+4       RGBA
+</code></pre> <p>data-pointer: pointer to the image data</p> <p>data-length: length of the data in bytes</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-OGL-CUBEMAP"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-OGL-CUBEMAP">LOAD-OGL-CUBEMAP</a> </code> <code class="qualifiers"></code> <code class="arguments">X-POS-FILEPATH X-NEG-FILEPATH Y-POS-FILEPATH Y-NEG-FILEPATH Z-POS-FILEPATH
+ Z-NEG-FILEPATH &amp;OPTIONAL (FORCE-CHANNELS :RGBA) (REUSE-TEXTURE-ID 0) FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads 6 images from disk into an OpenGL cubemap texture. Returns the texture-id</p> <p>x-pos-filepath: the name of the file to upload as a texture face</p> <p>x-neg-filepath: the name of the file to upload as a texture face</p> <p>y-pos-filepath: the name of the file to upload as a texture face</p> <p>y-neg-filepath: the name of the file to upload as a texture face</p> <p>z-pos-filepath: the name of the file to upload as a texture face</p> <p>z-neg-filepath: the name of the file to upload as a texture face</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-OGL-CUBEMAP-FROM-MEMORY"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-OGL-CUBEMAP-FROM-MEMORY">LOAD-OGL-CUBEMAP-FROM-MEMORY</a> </code> <code class="qualifiers"></code> <code class="arguments">X-POS-BUFFER-POINTER X-POS-BUFFER-LENGTH X-NEG-BUFFER-POINTER
+ X-NEG-BUFFER-LENGTH Y-POS-BUFFER-POINTER Y-POS-BUFFER-LENGTH
+ Y-NEG-BUFFER-POINTER Y-NEG-BUFFER-LENGTH Z-POS-BUFFER-POINTER
+ Z-POS-BUFFER-LENGTH Z-NEG-BUFFER-POINTER Z-NEG-BUFFER-LENGTH &amp;OPTIONAL
+ (FORCE-CHANNELS :RGBA) (REUSE-TEXTURE-ID 0) FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads 6 images from memory into an OpenGL cubemap texture.
+Returns the texture-id</p> <p>x-pos-filepath: the name of the file to upload as a texture face</p> <p>x-pos-length: length of the data in bytes</p> <p>x-neg-filepath: the name of the file to upload as a texture face</p> <p>x-neg-length: length of the data in bytes</p> <p>y-pos-filepath: the name of the file to upload as a texture face</p> <p>y-pos-length: length of the data in bytes</p> <p>y-neg-filepath: the name of the file to upload as a texture face</p> <p>y-neg-length: length of the data in bytes</p> <p>z-pos-filepath: the name of the file to upload as a texture face</p> <p>z-pos-length: length of the data in bytes</p> <p>z-neg-filepath: the name of the file to upload as a texture face</p> <p>z-neg-length: length of the data in bytes</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-OGL-HDR-TEXTURE"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-OGL-HDR-TEXTURE">LOAD-OGL-HDR-TEXTURE</a> </code> <code class="qualifiers"></code> <code class="arguments">FILEPATH &amp;OPTIONAL FAKE-HDR-FORMAT (RESCALE-TO-MAX 0) (REUSE-TEXTURE-ID 0)
+ FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads an HDR image from disk into an OpenGL texture. Returns the texture-id</p> <p>filename: the name of the file to upload as a texture</p> <p>fake-hdr-format: Which fake HDR representation to use:</p> <pre><code>Name         Meaning
+------------------------------------------
+:rgbe        (<a href="http://l1sp.org/cl/*">*</a> RGB (<a href="http://l1sp.org/cl/expt">expt</a> 2.0 (<a href="http://l1sp.org/cl/-">-</a> A 128.0))
+:rgb-div-a   (<a href="http://l1sp.org/cl//">/</a> RGB A)
+:rgb-div-a2  (<a href="http://l1sp.org/cl//">/</a> RGB (<a href="http://l1sp.org/cl/*">*</a> A A))
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>rescale-to-max: integer. <Not documented="" in="" original=""/></p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> <p><em>Note:</em> If you want a true HDR texture try using <code>stb-image:loadf</code> to load an
+        image as floating point data. The use GL to create an upload a
+        float-texture.</p> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-OGL-SINGLE-CUBEMAP"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-OGL-SINGLE-CUBEMAP">LOAD-OGL-SINGLE-CUBEMAP</a> </code> <code class="qualifiers"></code> <code class="arguments">FILEPATH FACE-ORDER &amp;OPTIONAL (FORCE-CHANNELS :RGBA) (REUSE-TEXTURE-ID 0)
+ FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads 1 image from disk and splits it into an OpenGL cubemap texture.
+Returns the texture-id</p> <p>filename: the name of the file to upload as a texture</p> <p>face-order: the order of the faces in the file. Any combination of NSWEUD,
+for North, South, Up, etc as a keyword. For example :UDNSWE</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-OGL-SINGLE-CUBEMAP-FROM-MEMORY"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-OGL-SINGLE-CUBEMAP-FROM-MEMORY">LOAD-OGL-SINGLE-CUBEMAP-FROM-MEMORY</a> </code> <code class="qualifiers"></code> <code class="arguments">DATA-POINTER DATA-LENGTH FACE-ORDER &amp;OPTIONAL (FORCE-CHANNELS :RGBA)
+ (REUSE-TEXTURE-ID 0) FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads 1 image from RAM and splits it into an OpenGL cubemap texture.
+Returns the texture-id</p> <p>data-pointer: pointer to the image data</p> <p>data-length: length of the data in bytes</p> <p>face-order: the order of the faces in the file. Any combination of NSWEUD,
+for North, South, Up, etc as a keyword. For example :UDNSWE</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-OGL-TEXTURE"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-OGL-TEXTURE">LOAD-OGL-TEXTURE</a> </code> <code class="qualifiers"></code> <code class="arguments">FILEPATH &amp;OPTIONAL (FORCE-CHANNELS :RGBA) (REUSE-TEXTURE-ID 0) FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads an image from disk into an OpenGL texture. Returns the texture-id</p> <p>filename: the name of the file to upload as a texture</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:LOAD-OGL-TEXTURE-FROM-MEMORY"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:LOAD-OGL-TEXTURE-FROM-MEMORY">LOAD-OGL-TEXTURE-FROM-MEMORY</a> </code> <code class="qualifiers"></code> <code class="arguments">DATA-POINTER DATA-LENGTH &amp;OPTIONAL (FORCE-CHANNELS :RGBA) (REUSE-TEXTURE-ID 0)
+ FLAGS</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Loads an image from RAM into an OpenGL texture. Returns the texture-id</p> <p>data-pointer: pointer to the image data</p> <p>data-length: length of the data in bytes</p> <p>force-channels: One of the following:</p> <pre><code>Name     Effect
+-------------------------------------------
+:auto    leaves the image in whatever format it was found
+:l       forces the image to load as Luminous (greyscale)
+:la      forces the image to load as Luminous with Alpha
+:rgb     forces the image to load as Red Green Blue
+:rgba    forces the image to load as Red Green Blue Alpha
+</code></pre> <p>reuse-texture-id: The gl texture id to reuse, or 0 to generate a new texture.</p> <p>flags: One or a list of the following</p> <pre><code>Name               Effect
+--------------------------------------------
+:power-of-two      force the image to be POT
+:mipmaps           generate mipmaps for the texture
+:texture-repeats   Sampling set to repeat (<a href="http://l1sp.org/cl/otherwise">otherwise</a> will clamp)
+:multiply-alpha    for using (:one, :one_minus_src_alpha) blending
+:invert-y          flip the image vertically
+:compress-to-dxt   if gpu support it, converts RGB to DXT1, RGBA to DXT5
+:dds-load-direct   will load DDS files directly without _ANY_ additional
+                   processing.
+</code></pre> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:SAVE-IMAGE"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:SAVE-IMAGE">SAVE-IMAGE</a> </code> <code class="qualifiers"></code> <code class="arguments">FILEPATH IMAGE-TYPE WIDTH HEIGHT CHANNELS DATA</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Saves an image from memory. Returns the filepath on success</p> <p>filename: the name of the file to save to</p> <p>image-type: One of the following formats</p> <pre><code>:tga
+:bmp
+:dds
+</code></pre> <p>width: the width of the image in pixels</p> <p>height: the height of the image in pixels</p> <p>channels: the number of channels. Where the integer is one of the following</p> <pre><code>Count   Meaning
+----------------------
+1       luminous
+2       luminous/alpha
+3       RGB
+4       RGBA
+</code></pre> <p>data: cffi pointer to the image data</p> </div> </article> </li><li style="list-style-type: none"> <a name="CL-SOIL:SAVE-SCREENSHOT"> </a> <article> <header class="function">  <h4 class="name"> <code>(</code> <code> <a href="#CL-SOIL:SAVE-SCREENSHOT">SAVE-SCREENSHOT</a> </code> <code class="qualifiers"></code> <code class="arguments">FILEPATH IMAGE-TYPE X Y WIDTH HEIGHT</code> <code>)</code> </h4> <i class="type">function</i>  </header> <div class="docstring"><p>Captures the OpenGL window (RGB) and saves it to disk.
+Returns the filepath on success</p> <p>filename: the name of the file to save to</p> <p>image-type: One of the following formats</p> <pre><code>:tga
+:bmp
+:dds
+</code></pre> <p>x: x component of origin in pixels</p> <p>x: y component of origin in pixels</p> <p>width: the width of the image in pixels</p> <p>height: the height of the image in pixels</p> </div> </article> </li></ul> </li></ul> </article>  </div> </body> </html> 

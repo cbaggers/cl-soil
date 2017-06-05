@@ -5,8 +5,9 @@
   :author "Chris Bagley (Baggers) <techsnuffle@gmail.com>"
   :license "BSD 2 Clause"
   :serial t
-  :depends-on (#:cffi)
+  :depends-on (#:cffi #:documentation-utils)
   :components ((:file "package")
                (:file "backend")
                (:file "cl-soil")
-	       (:file "stbi")))
+               (:file "stbi")
+               (:file "docs")))
