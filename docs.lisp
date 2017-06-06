@@ -356,8 +356,8 @@ Loads an image from disk. Returns the following:
 - A pointer to the image data
 - the width of the image
 - the height of the image
-- the component-count of the source data
-- the component-count of the loaded image
+- the component-count of the data as stored in the file
+- the component-count of the returned image data
 
 Where the component-count is one of the following:
 
@@ -389,8 +389,8 @@ Loads an image from memory. Returns the following:
 - A pointer to the image data
 - the width of the image in pixels
 - the height of the image in pixels
-- the component-count of the source data
-- the component-count of the loaded image
+- the component-count of the data as stored in the file
+- the component-count of the returned image data
 
 Where the component-count is one of the following:
 
