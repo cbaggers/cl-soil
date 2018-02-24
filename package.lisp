@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:cl-soil
-  (:use #:cl #:cffi #:documentation-utils)
+  (:use #:cl #:cffi)
   (:export #:load-ogl-texture
            #:load-ogl-texture-from-memory
            #:create-ogl-texture
@@ -19,6 +19,6 @@
            #:last-result))
 
 (defpackage #:stb-image
-  (:use #:cl #:cffi #:documentation-utils)
+  (:use #:cl #:cffi)
   (:nicknames :stbi)
   (:export #:loadf))
